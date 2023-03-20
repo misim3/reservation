@@ -1,0 +1,25 @@
+dto는 컨트롤러와 서비스 사이에서 데이터 전송을 위해 사용하는 객체이다.
+
+public class AccountDTO {
+    private Long id;
+    private String accountNumber;
+    private BigDecimal balance;
+
+    public AccountDTO(Long id, String accountNumber, BigDecimal balance) {
+        this.id = id;
+        this.accountNumber = accountNumber;
+        this.balance = balance;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+}

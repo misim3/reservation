@@ -1,0 +1,53 @@
+dao는 데이터 베이스에 접근하여 엔티티 객체들을 crud하는 클래스이다.
+public class AccountDAO {
+    private Connection conn;
+
+    public AccountDAO(Connection conn) {
+        this.conn = conn;
+    }
+
+    public Account findById(Long id) throws SQLException {
+        String sql = "SELECT id, account_number, balance FROM account WHERE id = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setLong(1, id);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            Long accountId = rs.getLong("id");
+            String accountNumber = rs.getString("account_number");
+            BigDecimal balance = rs.getBigDecimal("balance");
+            return new Account(accountId, accountNumber, balance);
+        }
+        return null;
+    }
+
+    public void save(Account account) throws SQLException {
+        String sql;
+        PreparedStatement stmt;
+        if (account.getId() == null) {
+            sql = "INSERT INTO account (account_number, balance) VALUES (?, ?)";
+            stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            stmt.setString(1, account.getAccountNumber());
+            stmt.setBigDecimal(2, account.getBalance());
+            stmt.executeUpdate();
+            ResultSet generatedKeys = stmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                Long accountId = generatedKeys.getLong(1);
+                account.setId(accountId);
+            }
+        } else {
+            sql = "UPDATE account SET account_number = ?, balance = ? WHERE id = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, account.getAccountNumber());
+            stmt.setBigDecimal(2, account.getBalance());
+            stmt.setLong(3, account.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void delete(Account account) throws SQLException {
+        String sql = "DELETE FROM account WHERE id = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setLong(1, account.getId());
+        stmt.executeUpdate();
+    }
+}
