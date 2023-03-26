@@ -7,13 +7,6 @@ public class ProductDto {
     private String productImageUrl;
 }
 
-public class Products {
-    private List<ProductDto> products;
-    private Integer totalCount;
-}
-
-===============================================
-
 public class CommentDto {
     private String comment;
     private Integer commentId;
@@ -60,12 +53,11 @@ public class ImageDto {
     private String saveFileName;
 }
 
-public class ProductImageDto {
-    private ImageDto imagedto;
+public class ProductImageDto extends ImageDto{
     private String type;
 }
 
-public class productPriceDto {
+public class ProductPriceDto {
     private LocalDateTime createDate;
     private Double discountRate;
     private LocalDateTime modifyDate;
@@ -75,23 +67,7 @@ public class productPriceDto {
     private Integer productPriceId;
 }
 
-public class Display {
-    private Double averageScore;
-    private List<CommentDto> comments;
-    private Integer displayInfo;
-    private ImageDto displayInfoImage;
-    private List<ProductImageDto> productImages;
-    private List<ProductPriceDto> productprices;
-}
-
-===============================================
-
-public class ReservationInfos {
-    private List<ReservationInfo> reservations;
-    private Integer size;
-}
-
-public class ReservationInfo {
+public class ReservationInfoDto {
     private Integer cancelYn;
     private LocalDateTime createDate;
     private DisplayInfoDto displayInfo;
@@ -106,33 +82,20 @@ public class ReservationInfo {
     private Integer totalPrice;
 }
 
-===============================================
-
-public class reservationPrice {
+//Post, Put
+public class ReservationPriceDto {
     private Integer count;
     private Integer productPriceId;
     private Integer reservationInfoId;
     private Integer reservationInfoPriceId;
 }
-//POST
-public reservations {
-    private Integer displayInfoId;
-    private List<reservationPrice> reservationPrices;
-    private Integer productId;
-    private String reservationEmail;
-    private String reservationName;
-    private String reservationTelephone;
-    private String reservationYearMonthDay;
-}
 
-===============================================
-//PUT
-public class ReservationId {
+public class ReservationResponseDto {
     private Integer cancelYn;
     private LocalDateTime createDate;
     private Integer displayInfoId;
     private LocalDateTime modifyDate;
-    private List<reservationPrice> reservationPrices;
+    private List<ReservationPriceDto> prices;
     private Integer productId;
     private String reservationDate;
     private String reservationEmail;
@@ -141,9 +104,8 @@ public class ReservationId {
     private String reservationTelephone;
 }
 
-===============================================
 //POST
-public comments {
+public class CommentResponseDto {
     private String comment;
     private Integer commentId;
     private ImageDto commentImage;
@@ -154,26 +116,14 @@ public comments {
     private Integer score;
 }
 
-===============================================
-
 public class CategoryDto {
     private Integer count;
     private Integer categoryId;
     private String categoryName;
 }
 
-public categories {
-    private List<CategoryDto> categories;
-}
-
-===============================================
-
 public class PromotionDto {
     private Integer promotionId;
     private Integer productId;
     private String productImageUrl;
-}
-
-public promotions {
-    private List<PromotionDto> promotions;
 }

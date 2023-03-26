@@ -1,3 +1,5 @@
+import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
+
 // 내 생각엔 selectAll(), selectbyid(), insert(), update(), deletebyid()를 구현하는 게 좋을 것 같다.
 // 왜냐하면, 각 메소드에서 사용할 sql언어가 메소드이름에 들어가서 어떤 역할을 수행하는지 더 명확하게 이해할 수 있기 때문이다.
 // 그리고 메소드 안의 코드 구현은 강의에 나온 NamedParameterJbdcTemplate을 사용하여 먼저 구현해보자.
@@ -14,164 +16,100 @@
 // 이렇게 되면, 레이어드아키텍처 스프링mvc 어노테이션 api사용법 상태유지기술 인터셉터 로깅 파일업로드&다운로드 경험.
 // 여기에 추가해야 할 것 jpa 사용해서 이 프로젝트 리팩토링해보기, api구축, 로그인인증인가
 
+
+// 03.24 dao master except post, put + query문 작성방법 + entity만 사용
+
 @Repository
 public class CategoryDao {
 
-    // 카테고리 전체를 가지고 오는 역할 -> 카테고리 개수, 이름
-    // 카테고리 아이디로 카테고리 이름 가져오는 역할
+    public List<category> selectAll() {
+        return jdbc.query(SELECT_ALL, ,rowMapper);
+    }
 
-    selectAll
-    selectById
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
+    public int selectCount(Integer categoryId) {
+        Map<String, Integer> param = Collections.singletonMap("categoryId", categoryId);
+        return jdbc.query(SELECT_COUNT, param, Integer.class);
+    }
 }
 
-@Repository
 public class FileInfoDao {
 
-    // 파일정보 아이디를 통해서 특정 파일정보 한 가지를 가져오는 역할
-
-    selectByfileId
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
+    public String selectSFN(Integer productId) {
+        Map<String, Integer> param = Collection.singletonMap("productId", productId);
+        return jdbc.query(SELECT_SFN, param, String.class);
+    }
 }
 
-@Repository
 public class ProductDao {
-    
-    // 상품 아이디를 통해 특정 상품 한 가지를 가져오는 역할
-    // 카테고리 아이디를 통해 그 카테고리에 해당하는 상품의 갯수 구하는 역할
 
-    selectById
-    selectCountByCategoryId
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
+    public List<Product> selectAll(Integer categoryId, Integer start) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("categoryId", categoryId);
+        params.put("start", start);
+        params.put("limit", 4);
+        return jdbc.query(SELECT_PAGING, params, rowMapper);
+    }
 }
 
-@Repository
-public class DisplayInfoDao {
-    
-    // 상품 아이디를 통해 특정 상품 전시정보 가져오는 역할
-
-    selectByProductId
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
-}
-
-@Repository
 public class ProductImageDao {
-    
-    // 상품 아이디를 통해 특정 상품 이미지 가져오는 역할
 
-    selectByProductId
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
+    public List<ProductImage> selectById(Integer displayInfoId) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("displayInfoId", displayInfoId);
+        return jdbc.query(SELECT_BY_ID, params, rowMapper);
+    }
 }
 
-@Repository
+public class productPriceDao {
+
+    public List<ProductPrice> selectById(Integer displayInfoId) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("displayInfoId", displayInfoId);
+        return jdbc.query(SELECT_BY_ID, params, rowMapper);
+    }
+}
+
+public class DisplayInfoDao {
+
+    public DisplayInfo selectById(Integer displayInfoId) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("displayInfoId", displayInfoId);
+        return jdbc.query(SELECT_BY_ID, params, DisplayInfoDto.class);
+    }
+}
+
 public class DisplayInfoImageDao {
-    
-    // 전시정보 아이디를 통해 특정 전시정보 이미지 가져오는 역할
 
-    selectByDisplayInfoId
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
+    public Image selectById(Integer displayInfoId) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("displayInfoId", displayInfoId);
+        return jdbc.query(SELECT_BY_ID, params, ImageDto.class);
+    }
 }
 
-@Repository
-public class ProductPriceDao {
-    
-    // 상품 아이디를 통해 특정 상품 가격 가져오는 역할
+public class ReservationDao {
 
-    selectAllByProductId
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
+    public List<ReservationInfo> selectById(String reservationEmail) {
+        Map<String, String> params = new HashMap<>();
+        params.put("reservationEmail", reservationEmail);
+        return jdbc.query(SELECT_BY_ID, params, rowMapper);
+    }
 }
 
-@Repository
+public class CommentDao {
+
+    public List<Comment> selectById(Integer displayInfoId) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("displayInfoId", displayInfoId);
+        return jdbc.query(SELECT_BY_ID, params, rowMapper);
+    }
+}
+
 public class PromotionDao {
-    
-    // 상품 아이디를 통해 특정 프로모션 아이디 가져오는 역할
 
-    selectByProductId
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
-}
-
-@Repository
-public class ReservationInfoDao {
-    
-    // 상품 아이디를 통해 특정 예약정보 가져오는 역할
-    // 예약 이메일을 통해 나의 예매내역 가져오는 역할
-
-    selectByProductId
-    selectAllByReservationEmail
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
-}
-
-@Repository
-public class ReservationInfoPriceDao {
-    
-    // 예약정보 아이디를 통해 특정 예약가격 가져오는 역할
-
-    selectAllByReservationInfoId
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
-}
-
-@Repository
-public class ReservationUserCommentDao {
-    
-    // 상품 아이디를 통해 전체 상품 한줄평 가져오는 역할
-
-    selectAllByProductId
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
-}
-
-@Repository
-public class ReservationUserCommentImageDao {
-    
-    // 예약 한줄평 아이디를 통해 특정 예약 한줄평 이미지 가져오는 역할
-
-    selectByReservationUserCommentId
-
-    // 유지보수 관점에서 필요한 메소드
-    // 새로운 카테고리 추가
-    // 카테고리 정보 업데이트
-    // 카테고리 삭제
+    public List<Promotion> selectById(Integer displayInfoId) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("displayInfoId", displayInfoId);
+        return jdbc.query(SELECT_BY_ID, params, rowMapper);
+    }
 }
