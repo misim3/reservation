@@ -39,52 +39,105 @@ public class ApiController {
         List<ReservationInfos> getAllReservationInfos(reservationEmail);
     }
 
-    // 예약하기 - random으로 생성해서 보내준다고 하는데 뭔소리인지 모르겠으니 딴 사람들이 한 것을 보고 하자.
+    // 예약하기
     @PostMapping("/reservations")
     public ReservationInfo createReservation(reservationParam?) {
-        addreservation
-        cancelYn
-        createdate
-        displayInfoId
-        modifydate
-        prices
-        productId
-        reservationdate
-        reservationEmail
-        reservationInfoId
-        reservationName;
-        reservationTelephone;
+        // 컨트롤러
+        (@RequestBody ReservationResponseDto reservationResponseDto) // 이런 방식으로 만들어도 될 것 같다.
+        ReservationService.createReservation(reservationResponseDto);
+
+        // 유효성 검사
+
+        // 랜덤 생성 예약 객체 반환
+        return random();
+        // 서비스
+        public Long createReservation(ReservationResponseDto reservationResponseDto) {
+
+            ReservationInfo reservationInfo = toReservationInfo(ReservationResponseDto reservationResponseDto);
+            // reservationResponseDto.getReservationPrices();
+            List<ReservationInfoPrice> list = toReservationInfoPrices(List<ReservationPriceDto> prices);
+
+            int p1 = ReservationDao.createReservationInfo(reservationInfo);
+            int p2 = ReservationDao.createReservationInfoPrices(list);            
+            
+            if (p1 == 1 && p2 == 1) {
+                // 유효성 검사
+                return 1;
+            }
+            return 0;
+        }
+        // 레포지토리
+        public Long createReservationInfo(ReservationInfo reservationInfo) {
+			SqlParameterSource params = new BeanPropertySqlParameterSource(reservationInfo);
+			return insertAction.executeAndReturnKey(params).longValue();
+        }
+        public Long createReservationInfoPrices(List<ReservationInfoPrice> list) {
+			SqlParameterSource params = new BeanPropertySqlParameterSource(list);
+			return insertAction.executeAndReturnKey(params).longValue();
+        }
     }
     
     // 예약 취소하기
     @PutMapping("/reservations/{reservationInfoId}")
     public void cancelReservation(Integer reservationInfoId) {
-        cancelreservation
-        cancelYn
-        createdate
-        displayInfoId
-        modifydate
-        prices
-        productId
-        reservationdate
-        reservationEmail
-        reservationInfoId
-        reservationName;
-        reservationTelephone;
+        // 컨트롤러
+        ReservationService.cancelReservation(reservationInfoId);
+
+        // 유효성 검사
+
+        // 랜덤 생성 예약 객체 반환
+        return random();
+
+        // 서비스
+        public int cancelReservation(Integer reservationInfoId) {
+            ReservationDao.cancelReservation(reservationInfoId);
+
+            // 유효성 검사
+        }
+
+        // 레포지토리
+        public Long cancelReservation(Integer reservationInfoId) {
+            Map<String, Integer> param = Collections.singletonMap("reservationInfoId", reservationInfoId);
+            return jdbc.update(UPDATE_BY_ID, param);
+        }
     }
     
-    // 한줄평 등록 - random으로 생성해서 보내준다고 하는데 뭔소리인지 모르겠으니 딴 사람들이 한 것을 보고 하자.
+    // 한줄평 등록
     @PostMapping("/reservations/{reservationInfoId}/comments")
     public ? createComment(file?, String comment, Integer productId, Integer reservationInfoId, Integer score) {
-        addcomment
-        comment
-        commentid
-        commentimage
-        createdate
-        modifydate
-        productId
-        reservationInfoId
-        score
+        // 컨트롤러
+        (@RequestBody CommentResponseDto commentResponseDto) // 이런 방식으로 만들어도 될 것 같다.
+        CommentService.createComment(commentResponseDto);
+
+        // 유효성 검사
+
+        // 랜덤 생성 예약 객체 반환
+        return random();
+        // 서비스
+        public Long createComment(CommentResponseDto commentResponseDto) {
+
+            ReservationUserComment comment = toComment(CommentResponseDto commentResponseDto);
+            // commentResponseDto.getImage();
+            ReservationUserCommentImage image = toImage(ImageDto image);
+
+            int p1 = CommentDao.createComment(comment);
+            int p2 = CommentDao.createCommentImage(image);            
+            
+            if (p1 == 1 && p2 == 1) {
+                // 유효성 검사
+                return 1;
+            }
+            return 0;
+        }
+        // 레포지토리
+        public Long createComment(ReservationUserComment comment) {
+			SqlParameterSource params = new BeanPropertySqlParameterSource(comment);
+			return insertAction.executeAndReturnKey(params).longValue();
+        }
+        public Long createCommentImage(ReservationUserCommentImage image) {
+			SqlParameterSource params = new BeanPropertySqlParameterSource(image);
+			return insertAction.executeAndReturnKey(params).longValue();
+        }
     }
 
     // 카테고리 목록 구하기
