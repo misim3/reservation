@@ -70,7 +70,7 @@ public class ProductPriceDto {
 public class ReservationInfoDto {
     private Integer cancelYn;
     private LocalDateTime createDate;
-    private DisplayInfoDto displayInfo;
+    private DisplayInfoDto displayInfodto;
     private Integer displayInfoId;
     private LocalDateTime modifyDate;
     private Integer productId;

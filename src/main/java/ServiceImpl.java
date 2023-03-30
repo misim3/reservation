@@ -47,13 +47,25 @@ public class ProductServiceImpl implements ProductService {
 	public List<ProductImageDto> getProductImages(Integer displayInfoId) {
 		List<ProductImage> list = productImageDao.selectById(displayInfoId);
 
-		return list;
+		List<ProductImageDto> dlist = new List<ProductImageDto>();
+
+		for(int i=0; i<list.size(); i++) {
+			dlist[i] = mapping.toProductImageDto(list[i]);
+		}
+
+		return dlist;
 	}
 
     public List<ProductPriceDto> getProductPrices(Integer displayInfoId) {
-		List<ProductPrice> list = productPriceDao.selectById(displayInfoId);
+		List<ProductPrice> list = productPriceDao.selectAllById(displayInfoId);
 
-		return list;
+		List<ProductPriceDto> dlist = new List<ProductPriceDto>();
+
+		for(int i=0; i<list.size(); i++) {
+			dlist[i] = mapping.toProductPriceDto(list[i]);
+		}
+
+		return dlist;
 	}
 }
 
@@ -63,11 +75,15 @@ public class DisplayServiceImpl implements DisplayService {
 	public DisplayInfoDto getDisplayInfo(Integer displayInfoId) {
 		DisplayInfo displayInfo = displayInfoDao.selectById(displayInfoId);
 
+		DisplayInfoDto displayInfoDto = mapping.toDisplayInfoDto(displayInfo);
+
 		return displayInfoDto;
 	}
 
 	public ImageDto getDisplayInfoImage(Integer displayInfoId) {
-		Image displayInfoImage = displayInfoImageDao.selectById(displayInfoId);
+		DisplayInfoImage displayInfoImage = displayInfoImageDao.selectById(displayInfoId);
+
+		ImageDto displayInfoImageDto = mapping.toDisplayInfoImageDto(displayInfoImage);
 
 		return displayInfoImageDto;
 	}
@@ -79,7 +95,13 @@ public class ReservationServiceImpl implements ReservationService {
 	public List<ReservationInfoDto> getReservations(String reservationEmail) {
 		List<ReservationInfo> list = reservationDao.selectAll(reservationEmail);
 
-		return list;
+		List<ReservationInfoDto> dlist = new List<ReservationInfoDto>();
+
+		for(int i=0; i<list.size(); i++) {
+			dlist[i] = mapping.toReservationInfoDto(list[i]);
+		}
+
+		return dlist;
 	}
 
     public ReservationResponseDto addreservation(Map<String, Object> reservationParam, Integer clientIp) {
@@ -148,8 +170,15 @@ public class CommentServiceImpl implements CommentService {
 	public List<CommentDto> getComments(Integer displayInfo) {
 		List<Comment> list = commentDao.selectAll(displayInfo);
 
-		return list;
+		List<CommentDto> dlist = new List<CommentDto>();
+
+		for(int i=0; i<list.size(); i++) {
+			dlist[i] = mapping.toCommentDto(list[i]);
+		}
+
+		return dlist;
 	}
+
     CommentResponseDto commentResponseDto = commentService.addcomment(attachedImage, comment, productId, reservationInfoId, score, clientIp);
 	/* 얘는 받아온 거 이미지 처리만하고 그대로 담아서 반환.
 	{

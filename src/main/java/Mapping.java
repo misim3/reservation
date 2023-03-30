@@ -4,14 +4,16 @@ public class ProductConverter {
 
     public ProductDto toProductDto(Product product) {
         ProductDto productDto = new ProductDto();
-        Integer id = product.getProductId();
-        
-        productDto.setDisplayInfoId(); // displayinfo by id
-        productDto.setPlaceName(); // displayinfo by id
+        Integer productId = product.getProductId();
+        DisplayInfo displayInfo = DisplayInfoDao.selectById(productId);
+        productDto.setDisplayInfoId(displayInfo.getDisplayInfoId()); // displayinfo by id
+        productDto.setPlaceName(displayInfo.getPlaceName()); // displayinfo by id
         productDto.setProductContent(product.getContent()); // product
         productDto.setProductDescription(product.getDescription()); // product
-        productDto.setProductId(id); // product
-        productDto.setProductImageUrl(); // productimage by id -> fileinfo by fileid
+        productDto.setProductId(productId); // product
+        int fileId = ProductImageDao.selectById(productId);
+        String saveFileName = FileInfoDao.selectSFN(fileId);
+        productDto.setProductImageUrl(saveFileName); // productimage by id -> fileinfo by fileid
         return productDto;
     }
 }
@@ -20,102 +22,120 @@ public class CommentConverter {
 
     public CommentDto toCommentDto(ReservationUserComment comment) {
         CommentDto commentDto = new CommentDto();
-        commentDto.setComment(); // reservationUserComment
-        commentDto.setCommentId(); // reservationUserComment
+        commentDto.setComment(comment.getComment()); // reservationUserComment
+        int commentId = comment.getCommentId();
+        commentDto.setCommentId(commentId); // reservationUserComment
         commentDto.setCommentImages(); 
+        ReservationUserCommentImage reservationUserCommentImage = ReservationUserCommentImageDao.selectById(commentId);
+        List<ImageDto> Images = FileInfoDao.selectAll(reservationUserCommentImage.getFileId());
         // reservationUserCommentimage by reservationUserCommentId = fileid를 구한다. 
         // List<ImageDto> fileid로 imageDto 만들고 리스트에 추가
-        commentDto.setCreateDate(); // reservationUserComment
-        commentDto.setModifyDate(); // reservationUserComment
-        commentDto.setProductId(); // reservationUserComment
-        commentDto.setReservationDate(); // reservationInfo by reservationinfoid
-        commentDto.setReservationEmail(); // reservationInfo by reservationinfoid
-        commentDto.setReservationInfoId(); // reservationUserComment
-        commentDto.setReservationName(); // reservationInfo by reservationinfoid
-        commentDto.setReservationTelephone(); // reservationInfo by reservationinfoid
-        commentDto.setScore(); // reservationUserComment
+        commentDto.setCreateDate(comment.getCreateDate()); // reservationUserComment
+        commentDto.setModifyDate(comment.getModifyDate()); // reservationUserComment
+        commentDto.setProductId(comment.getProductId()); // reservationUserComment
+        int reservationInfoId = comment.getReservationInfoId();
+        ReservationInfo reservationInfo = ReservationInfoDao.selectById(reservationInfoId);
+        commentDto.setReservationDate(reservationInfo.getReservationDate()); // reservationInfo by reservationinfoid
+        commentDto.setReservationEmail(reservationInfo.getReservationEmail); // reservationInfo by reservationinfoid
+        commentDto.setReservationInfoId(reservationInfoId); // reservationUserComment
+        commentDto.setReservationName(reservationInfo.getReservationName); // reservationInfo by reservationinfoid
+        commentDto.setReservationTelephone(reservationInfo.getReservationTel); // reservationInfo by reservationinfoid
+        commentDto.setScore(comment.getScore()); // reservationUserComment
         return commentDto;
     }
 }
 
 public DisplayInfoDto toDisplayInfoDto(DisplayInfo displayInfo) {
     DisplayInfoDto displayInfoDto = new DisplayInfoDto();
-    displayInfoDto.setCategoryId(); // Product by productId
-    displayInfoDto.setCategoryName(); // Product by productId = categoryId -> Category by categoryId
-    displayInfoDto.setCreateDate(); // displayInfo
-    displayInfoDto.setDisplayInfoId(); // displayInfo
-    displayInfoDto.setEmail(); // displayInfo
-    displayInfoDto.setHomepage(); // displayInfo
-    displayInfoDto.setModifyDate(); // displayInfo
-    displayInfoDto.setOpeningHours(); // displayInfo
-    displayInfoDto.setPlaceLot(); // displayInfo
-    displayInfoDto.setPlaceName(); // displayInfo
-    displayInfoDto.setPlaceStreet(); // displayInfo
-    displayInfoDto.setProductContent(); // Product by productId
-    displayInfoDto.setProductDescription(); // Product by productId
+    int productId = displayInfo.getProductId();
+    Product product = ProductDao.selectProduct(productId);
+    displayInfoDto.setCategoryId(product.getCategoryId()); // Product by productId
+    displayInfoDto.setCategoryName(product.getCategoryName()); // Product by productId = categoryId -> Category by categoryId
+    displayInfoDto.setCreateDate(displayInfo.getCreateDate()); // displayInfo
+    displayInfoDto.setDisplayInfoId(displayInfo.getDisplayInfoId()); // displayInfo
+    displayInfoDto.setEmail(displayInfo.getEmail()); // displayInfo
+    displayInfoDto.setHomepage(displayInfo.getHomepage()); // displayInfo
+    displayInfoDto.setModifyDate(displayInfo.getModifyDate()); // displayInfo
+    displayInfoDto.setOpeningHours(displayInfo.getOpeningHours()); // displayInfo
+    displayInfoDto.setPlaceLot(displayInfo.getPlaceLot()); // displayInfo
+    displayInfoDto.setPlaceName(displayInfo.getPlaceName()); // displayInfo
+    displayInfoDto.setPlaceStreet(displayInfo.getPlaceStreet()); // displayInfo
+    displayInfoDto.setProductContent(product.getContent()); // Product by productId
+    displayInfoDto.setProductDescription(product.getDescription()); // Product by productId
     displayInfoDto.setProductEvent(); // null
-    displayInfoDto.setProductId(); // displayInfo
-    displayInfoDto.setTelePhone(); // displayInfo
+    displayInfoDto.setProductId(productId); // displayInfo
+    displayInfoDto.setTelePhone(displayInfo.getTelePhone()); // displayInfo
     return displayInfoDto;
 }
 
 public ImageDto toDisplayInfoImageDto(DisplayInfoImage displayInfoImage) {
     ImageDto displayInfoImageDto = new ImageDto();
-    displayInfoImageDto.setContentType(); // fileinfo by fileid
-    displayInfoImageDto.setCreateDate(); // fileinfo by fileid
-    displayInfoImageDto.setDeleteFlag(); // fileinfo by fileid
-    displayInfoImageDto.setDisplayInfoId(); // displayInfoImage
-    displayInfoImageDto.setDisplayInfoImageId(); // displayInfoImage
-    displayInfoImageDto.setFileId(); // displayInfoImage
-    displayInfoImageDto.setFileName(); // fileinfo by fileid
-    displayInfoImageDto.setModifyDate(); // fileinfo by fileid
-    displayInfoImageDto.setSaveFileName(); // fileinfo by fileid
+    int fileId = displayInfoImage.getFileId();
+    FileInfo fileInfo = FileInfoDao.selectFileInfo(fileId);
+    displayInfoImageDto.setContentType(fileInfo.getContentType()); // fileinfo by fileid
+    displayInfoImageDto.setCreateDate(fileInfo.getCreateDate()); // fileinfo by fileid
+    displayInfoImageDto.setDeleteFlag(fileInfo.getDeleteFlag()); // fileinfo by fileid
+    displayInfoImageDto.setDisplayInfoId(displayInfoImage.getDisplayInfoId()); // displayInfoImage
+    displayInfoImageDto.setDisplayInfoImageId(displayInfoImage.getDisplayInfoImageId()); // displayInfoImage
+    displayInfoImageDto.setFileId(fileId); // displayInfoImage
+    displayInfoImageDto.setFileName(fileInfo.getFileName()); // fileinfo by fileid
+    displayInfoImageDto.setModifyDate(fileInfo.getModifyDate()); // fileinfo by fileid
+    displayInfoImageDto.setSaveFileName(fileInfo.getSaveFileName()); // fileinfo by fileid
     return displayInfoImageDto;
 }
 
 public ProductImageDto toProductImageDto(ProductImage productImage) {
     ProductImageDto productImageDto = new ProductImageDto();
-    productImageDto.setContentType(); // fileinfo by fileid
-    productImageDto.setCreateDate(); // fileinfo by fileid
-    productImageDto.setDeleteFlag(); // fileinfo by fileid
+    int fileId = productImage.getFileId();
+    FileInfo fileInfo = FileInfoDao.selectFileInfo(fileId);
+    productImageDto.setContentType(fileInfo.getContentType()); // fileinfo by fileid
+    productImageDto.setCreateDate(fileInfo.getCreateDate()); // fileinfo by fileid
+    productImageDto.setDeleteFlag(fileInfo.getDeleteFlag()); // fileinfo by fileid
     productImageDto.setDisplayInfoId(); // displayinfo by productid
     productImageDto.setDisplayInfoImageId(); // displayinfo by productid
-    productImageDto.setFileId(); // ProductImage
-    productImageDto.setFileName(); // fileinfo by fileid
-    productImageDto.setModifyDate(); // fileinfo by fileid
-    productImageDto.setSaveFileName(); // fileinfo by fileid
-    productImageDto.setType(); // ProductImage
+    productImageDto.setFileId(fileId); // ProductImage
+    productImageDto.setFileName(fileInfo.getFileName()); // fileinfo by fileid
+    productImageDto.setModifyDate(fileInfo.getModifyDate()); // fileinfo by fileid
+    productImageDto.setSaveFileName(fileInfo.getSaveFileName()); // fileinfo by fileid
+    productImageDto.setType(productImage.getType()); // ProductImage
     return productImageDto;
 }
 
 public ProductPriceDto toProductPriceDto(ProductPrice productPrice) {
     ProductPriceDto productPriceDto = new ProductPriceDto();
-    productPriceDto.setCreateDate(); // productPriceDto
-    productPriceDto.setDiscountRate(); // productPriceDto
-    productPriceDto.setModifyDate(); // productPriceDto
-    productPriceDto.setPrice(); // productPriceDto
-    productPriceDto.setPriceTypeName(); // productPriceDto
-    productPriceDto.setProductId(); // productPriceDto
-    productPriceDto.setProductPriceId(); // productPriceDto
+    productPriceDto.setCreateDate(productPrice.getCreateDate()); // productPrice
+    productPriceDto.setDiscountRate(productPrice.getDiscountRate()); // productPrice
+    productPriceDto.setModifyDate(productPrice.getModifyDate()); // productPrice
+    productPriceDto.setPrice(productPrice.getPrice()); // productPrice
+    productPriceDto.setPriceTypeName(productPrice.getPriceTypeName()); // productPrice
+    productPriceDto.setProductId(productPrice.getProductId()); // productPrice
+    productPriceDto.setProductPriceId(productPrice.getProductPriceId()); // productPrice
     return productPriceDto;
 }
 
 public ReservationInfoDto toReservationInfoDto(ReservationInfo reservationInfo) {
     ReservationInfoDto reservationInfoDto = new ReservationInfoDto();
-    reservationInfoDto.setCancelYn(); // reservationInfo
-    reservationInfoDto.setCreateDate(); // reservationInfo
-    reservationInfoDto.setDisplayInfo();
+    reservationInfoDto.setCancelYn(reservationInfo.getCancelFlag()); // reservationInfo
+    reservationInfoDto.setCreateDate(reservationInfo.getCreateDate()); // reservationInfo
+    int displayInfoId = reservationInfo.getDisplayInfoId();
+    DisplayInfo displayInfo = DisplayInfoDao.selectById(displayInfoId);
+    reservationInfoDto.setDisplayInfoDto(mapping.toDisplayInfoDto(displayInfo));
     // displayinfoid로 displayinfo를 가져오고 이걸로 displayinfodto를 만든다.
     // 위에서 만든 함수 사용
-    reservationInfoDto.setDisplayInfoId(); // reservationInfo
-    reservationInfoDto.setModifyDate(); // reservationInfo
-    reservationInfoDto.setProducId(); // reservationInfo
-    reservationInfoDto.setReservationDate(); // reservationInfo
-    reservationInfoDto.setReservationEmail(); // reservationInfo
-    reservationInfoDto.setReservationInfoId(); // reservationInfo
-    reservationInfoDto.setReservationName(); // reservationInfo
-    reservationInfoDto.setReservationTelephone(); // reservationInfo
-    reservationInfoDto.setTotalPrice();
+    reservationInfoDto.setDisplayInfoId(displayInfoId); // reservationInfo
+    reservationInfoDto.setModifyDate(reservationInfo.getModifyDate()); // reservationInfo
+    reservationInfoDto.setProducId(reservationInfo.getProductId()); // reservationInfo
+    reservationInfoDto.setReservationDate(reservationInfo.getReservationDate()); // reservationInfo
+    reservationInfoDto.setReservationEmail(reservationInfo.getReservationEmail()); // reservationInfo
+    int reservationInfoId = reservationInfo.getReservationInfoId();
+    reservationInfoDto.setReservationInfoId(reservationInfoId); // reservationInfo
+    reservationInfoDto.setReservationName(reservationInfo.getReservationName()); // reservationInfo
+    reservationInfoDto.setReservationTelephone(reservationInfo.getReservationTel()); // reservationInfo
+    int totalPrice = 0;
+    ReservationInfoPrice reservationInfoPrice = ReservationInfoPriceDao.selectById(reservationInfoId);
+    ProductPrice productPrice = ProductPriceDao.selectById(reservationInfoPrice.getProductPriceId());
+    totalPrice += productPrice * reservationInfoPrice.getCount();
+    reservationInfoDto.setTotalPrice(totalPrice);
     // reservationinfoprice by reservationInfoId
     // reservationinfoprice에서 productpriceid를 이용해서 가격을 가져오고 그 값에 count를 곱해서 계속 더하는 방식
     return reservationInfoDto;
@@ -135,7 +155,8 @@ public PromotionDto toPromotionDto(Promotion promotion) {
     promotionDto.setPromotionId(promotion.getPromotionId()); // promotion
     int productId = promotion.getProductId()
     promotionDto.setProducId(productId); // promotion
-    String saveFileName = FileInfoDao.selectSFN(productId);
-    promotionDto.setProductImageUrl(saveFileName); // Fileinfo by productid = savefilename
+    int fileId = ProductImageDao.selectById(productId);
+    String saveFileName = FileInfoDao.selectSFN(fileId);
+    promotionDto.setProductImageUrl(saveFileName); // productimage by id -> fileinfo by fileid
     return promotionDto;
 }

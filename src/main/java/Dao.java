@@ -19,6 +19,9 @@ import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
 
 // 03.24 dao master except post, put + query문 작성방법 + entity만 사용
 
+// 03.26 쿼리문의 반환값이 정확하게 뭔지 모르겠다.
+// 이건 직접 구현을 다 하고 실행시켜서 리스트인지 객체 하나인지 확인하자.
+
 @Repository
 public class CategoryDao {
 
@@ -34,9 +37,20 @@ public class CategoryDao {
 
 public class FileInfoDao {
 
-    public String selectSFN(Integer productId) {
-        Map<String, Integer> param = Collection.singletonMap("productId", productId);
+    public String selectSFN(Integer fileId) {
+        Map<String, Integer> param = Collection.singletonMap("fileId", fileId);
         return jdbc.query(SELECT_SFN, param, String.class);
+    }
+
+    public FileInfo selectFileInfo(Integer fileId) {
+        Map<String, Integer> param = Collection.singletonMap("fileId", fileId);
+        return jdbc.query(SELECT_FIF, param, FileInfo.class);
+    }
+
+    public List<FileInfo> selectAll(Integer fileId) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("fileId", fileId);
+        return jdbc.query(SELECT_BY_ID, params, rowMapper);
     }
 }
 
@@ -49,50 +63,76 @@ public class ProductDao {
         params.put("limit", 4);
         return jdbc.query(SELECT_PAGING, params, rowMapper);
     }
+
+    public Product selectProduct(Integer productId) {
+        Map<String, Integer> param = Collection.singletonMap("productId", productId);
+        return jdbc.query(SELECT_P, param, Product.class);
+    }
 }
 
 public class ProductImageDao {
 
-    public List<ProductImage> selectById(Integer displayInfoId) {
+    public List<ProductImage> selectAllById(Integer displayInfoId) {
         Map<String, Integer> params = new HashMap<>();
         params.put("displayInfoId", displayInfoId);
         return jdbc.query(SELECT_BY_ID, params, rowMapper);
+    }
+
+    public Integer selectById(Integer productId) {
+        Map<String, Integer> param = Collection.singletinMap("productId", productId);
+        return jdbc.query(SELECT_FID, param, Integer.class);
     }
 }
 
 public class productPriceDao {
 
-    public List<ProductPrice> selectById(Integer displayInfoId) {
+    public List<ProductPrice> selectAllById(Integer displayInfoId) {
         Map<String, Integer> params = new HashMap<>();
         params.put("displayInfoId", displayInfoId);
         return jdbc.query(SELECT_BY_ID, params, rowMapper);
+    }
+
+    public ProductPrice selectById(Integer productPriceId) {
+        Map<String, Integer> param = Collection.singletinMap("productPriceId", productPriceId);
+        return jdbc.query(SELECT_FID, param, ProductPrice.class);
     }
 }
 
 public class DisplayInfoDao {
 
     public DisplayInfo selectById(Integer displayInfoId) {
-        Map<String, Integer> params = new HashMap<>();
-        params.put("displayInfoId", displayInfoId);
-        return jdbc.query(SELECT_BY_ID, params, DisplayInfoDto.class);
+        Map<String, Integer> param = Collection.singletinMap("displayInfoId", displayInfoId);
+        return jdbc.query(SELECT_FID, param, DisplayInfo.class);
     }
 }
 
 public class DisplayInfoImageDao {
 
-    public Image selectById(Integer displayInfoId) {
-        Map<String, Integer> params = new HashMap<>();
-        params.put("displayInfoId", displayInfoId);
-        return jdbc.query(SELECT_BY_ID, params, ImageDto.class);
+    public DisplayInfoImage selectById(Integer displayInfoId) {
+        Map<String, Integer> param = Collection.singletinMap("displayInfoId", displayInfoId);
+        return jdbc.query(SELECT_FID, param, DisplayInfoImage.class);
     }
 }
 
 public class ReservationDao {
 
-    public List<ReservationInfo> selectById(String reservationEmail) {
+    public List<ReservationInfo> selectAll(String reservationEmail) {
         Map<String, String> params = new HashMap<>();
         params.put("reservationEmail", reservationEmail);
         return jdbc.query(SELECT_BY_ID, params, rowMapper);
+    }
+
+    public ReservationInfo selectById(Integer reservationInfoId) {
+        Map<String, Integer> param = Collection.singletinMap("reservationInfoId", reservationInfoId);
+        return jdbc.query(SELECT_FID, param, ReservationInfo.class);
+    }
+}
+
+public class ReservationInfoPriceDao {
+
+    public ReservationInfoPrice selectById(Integer reservationInfoId) {
+        Map<String, Integer> param = Collection.singletinMap("reservationInfoId", reservationInfoId);
+        return jdbc.query(SELECT_FID, param, ReservationInfoPrice.class);
     }
 }
 
@@ -102,6 +142,14 @@ public class CommentDao {
         Map<String, Integer> params = new HashMap<>();
         params.put("displayInfoId", displayInfoId);
         return jdbc.query(SELECT_BY_ID, params, rowMapper);
+    }
+}
+
+public class CommentImageDao {
+
+    public ReservationUserCommentImage selectById(Integer commentId) {
+        Map<String, Integer> param = Collection.singletinMap("commentId", commentId);
+        return jdbc.query(SELECT_FID, param, ReservationUserCommentImage.class);
     }
 }
 
