@@ -1,5 +1,13 @@
 // Put, Post 제외하고 작성함.
 
+// 03.31 toproductdto에서 productid로 productimage에서 select를 하면 list로 결과값이 나온다.
+// 이때 가장 앞에있는 ? sfn의 숫자가 가장 작은 값 하나만 저장하는데
+// 이걸 어떻게 한 가지만 가져오는 지 확인 done
+
+// entity -> dto
+
+// image, price 부분만 리스트인지 객체 하나인지 확인하자.
+
 public class ProductConverter {
 
     public ProductDto toProductDto(Product product) {
@@ -29,7 +37,7 @@ public class CommentConverter {
         ReservationUserCommentImage reservationUserCommentImage = ReservationUserCommentImageDao.selectById(commentId);
         List<ImageDto> Images = FileInfoDao.selectAll(reservationUserCommentImage.getFileId());
         // reservationUserCommentimage by reservationUserCommentId = fileid를 구한다. 
-        // List<ImageDto> fileid로 imageDto 만들고 리스트에 추가
+        // List<ImageDto> fileid로 imageDto 만들고 리스트에 추가 done
         commentDto.setCreateDate(comment.getCreateDate()); // reservationUserComment
         commentDto.setModifyDate(comment.getModifyDate()); // reservationUserComment
         commentDto.setProductId(comment.getProductId()); // reservationUserComment
@@ -48,7 +56,7 @@ public class CommentConverter {
 public DisplayInfoDto toDisplayInfoDto(DisplayInfo displayInfo) {
     DisplayInfoDto displayInfoDto = new DisplayInfoDto();
     int productId = displayInfo.getProductId();
-    Product product = ProductDao.selectProduct(productId);
+    Product product = ProductDao.selectById(productId);
     displayInfoDto.setCategoryId(product.getCategoryId()); // Product by productId
     displayInfoDto.setCategoryName(product.getCategoryName()); // Product by productId = categoryId -> Category by categoryId
     displayInfoDto.setCreateDate(displayInfo.getCreateDate()); // displayInfo
@@ -121,7 +129,7 @@ public ReservationInfoDto toReservationInfoDto(ReservationInfo reservationInfo) 
     DisplayInfo displayInfo = DisplayInfoDao.selectById(displayInfoId);
     reservationInfoDto.setDisplayInfoDto(mapping.toDisplayInfoDto(displayInfo));
     // displayinfoid로 displayinfo를 가져오고 이걸로 displayinfodto를 만든다.
-    // 위에서 만든 함수 사용
+    // 위에서 만든 함수 사용 done
     reservationInfoDto.setDisplayInfoId(displayInfoId); // reservationInfo
     reservationInfoDto.setModifyDate(reservationInfo.getModifyDate()); // reservationInfo
     reservationInfoDto.setProducId(reservationInfo.getProductId()); // reservationInfo
@@ -132,19 +140,22 @@ public ReservationInfoDto toReservationInfoDto(ReservationInfo reservationInfo) 
     reservationInfoDto.setReservationName(reservationInfo.getReservationName()); // reservationInfo
     reservationInfoDto.setReservationTelephone(reservationInfo.getReservationTel()); // reservationInfo
     int totalPrice = 0;
-    ReservationInfoPrice reservationInfoPrice = ReservationInfoPriceDao.selectById(reservationInfoId);
-    ProductPrice productPrice = ProductPriceDao.selectById(reservationInfoPrice.getProductPriceId());
-    totalPrice += productPrice * reservationInfoPrice.getCount();
+    List<ReservationInfoPrice> prices = ReservationInfoPriceDao.selectById(reservationInfoId);
+    int price = 0;
+    for(int i=0; i<prices.size(); i++) {
+        price = ProductPriceDao.selectById(prices.getProductPriceId())
+        totalPrice +=  price * prices[i].getCount();
+    }
     reservationInfoDto.setTotalPrice(totalPrice);
     // reservationinfoprice by reservationInfoId
-    // reservationinfoprice에서 productpriceid를 이용해서 가격을 가져오고 그 값에 count를 곱해서 계속 더하는 방식
+    // reservationinfoprice에서 productpriceid를 이용해서 가격을 가져오고 그 값에 count를 곱해서 계속 더하는 방식 done
     return reservationInfoDto;
 }
 
 public CategoryDto toCategoryDto(Category category) {
     CategoryDto categoryDto = new CategoryDto();
     int count = CategoryDao.selectCount(category.getCategoryId());
-    categoryDto.setCount(count); // 직접 select by categoryid로 실행시켜서 가져와야함.
+    categoryDto.setCount(count); // 직접 select by categoryid로 실행시켜서 가져와야함. done
     categoryDto.setCategoryId(category.getCategoryId()); // category
     categoryDto.setCategoryName(category.getCategoryName()); // category
     return categoryDto;
@@ -159,4 +170,53 @@ public PromotionDto toPromotionDto(Promotion promotion) {
     String saveFileName = FileInfoDao.selectSFN(fileId);
     promotionDto.setProductImageUrl(saveFileName); // productimage by id -> fileinfo by fileid
     return promotionDto;
+}
+
+// dto -> entity
+
+public ReservationInfo toReservationInfo(ReservationInfoDto reservationInfoDto) {
+    ReservationInfo info = new ReservationInfo();
+    info.setReservationInfoId(reservationInfoDto.getReservationInfoId());
+    info.setProducId(reservationInfoDto.getProductId());
+    info.setDisplayInfoId(reservationInfoDto.getDisplayInfoId());
+    info.setReservationName(reservationInfoDto.getReservationName());
+    info.setReservationTel(reservationInfoDto.getReservationTelephone());
+    info.setReservationEmail(reservationInfoDto.getReservationEmail());
+    info.setReservationDate(reservationInfoDto.getReservationDate());
+    info.setCancelFlag(reservationInfoDto.getCancelYn());
+    info.setCreateDate(reservationInfoDto.getCreateDate());
+    info.setModifyDate(reservationInfoDto.getModifyDate());
+    
+    return info;
+}
+
+public ReservationInfoPrice toReservationInfoPrice(ReservationPriceDto priceDto) {
+    ReservationInfoPrice price = new ReservationInfoPrice();
+    price.setReservationPriceId(priceDto.getReservationPriceId());
+    price.setReservationInfoId(priceDto.getReservationInfoId());
+    price.setProducId(priceDto.getProductId());
+    price.setCount(priceDto.getCount());
+
+    return price;
+}
+
+public ReservationUserComment toComment(CommentResponseDto commentResponseDto) {
+    ReservationUserComment comment = new ReservationUserComment();
+    comment.setReservationUserCommentId(commentResponseDto.getCommentId());
+    comment.setProductId(commentResponseDto.getProductId());
+    comment.setReservationInfoId(commentResponseDto.getReservationInfoId());
+    comment.setScore(commentResponseDto.getScore());
+    comment.setComment(commentResponseDto.getComment());
+    comment.setCreateDate(commentResponseDto.getCreateDate());
+    comment.setModifyDate(commentResponseDto.getModifyDate());
+
+    return comment;
+}
+
+public ReservationUserCommentImage toImage(ImageDto imageDto) {
+    ReservationUserCommentImage image = new ReservationUserCommentImage();
+    image.setReservationUserCommentImageId(imageDto.getId());
+    image.setFileId(imageDto.getFileId());
+
+    return image;
 }

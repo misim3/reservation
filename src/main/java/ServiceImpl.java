@@ -7,202 +7,147 @@ import java.util.List;
 // 그런데 put, post 방식을 제외하면 그럴 일이 없다.
 // Dao를 통해 entity를 받아와서 Mapping 클래스를 이용해서 Dto로 만들자.
 
+// 03.31 mapping 함수에서 entity를 dto로 변환하는 데, 이때 이 함수 안에서 나머지 entity를 불러와 dto를 완성할지
+// 아니면 서비스에서 전체 entity를 불러와서 mapping 함수에 넣어서 완성할지
+// 일단 전자로 구현함.
+
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-	public List<CategoryDto> getCategories() {
-		List<Category> list = categoryDao.selectAll();
+	public List<String> getCategories() {
+		List<String> list = categoryDao.selectAll();
 
-		List<CategoryDto> dlist = new List<CategoryDto>();
-
-		for(int i=0; i<list.size(); i++) {
-			dlist[i] = mapping.toCategoryDto(list[i]);
-		}
-
-		return dlist;
+		return list;
 	}
 }
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-	public List<ProductDto> getProducts(Integer categoryId, Integer start) {
-		List<Product> list = productDao.selectAll(categoryId, start);
+	public List<ProductDto> getAllProducts(Integer categoryId, Integer start) {
+		List<Product> elist = productDao.selectAll(categoryId, start);
 
 		List<ProductDto> dlist = new List<ProductDto>();
 
-		for(int i=0; i<list.size(); i++) {
-			dlist[i] = mapping.toProductDto(list[i]);
+		for(int i=0; i<elist.size(); i++) {
+			dlist[i] = mapping.toProductDto(elist[i]);
 		}
 
-		return dlist;
-	}
+		int totalCount = categorieDao.selectCount(categoryId);
 
-	public Integer getCount(Integer categoryId) {
-		Integer count = categoryDao.selectCount(categoryId);
+		Map<String, Object> result = new HashMap<>();
+		result.put("items", dlist);
+		result.put("totalCount", totalCount);
 
-		return count;
-	}
-
-	public List<ProductImageDto> getProductImages(Integer displayInfoId) {
-		List<ProductImage> list = productImageDao.selectById(displayInfoId);
-
-		List<ProductImageDto> dlist = new List<ProductImageDto>();
-
-		for(int i=0; i<list.size(); i++) {
-			dlist[i] = mapping.toProductImageDto(list[i]);
-		}
-
-		return dlist;
-	}
-
-    public List<ProductPriceDto> getProductPrices(Integer displayInfoId) {
-		List<ProductPrice> list = productPriceDao.selectAllById(displayInfoId);
-
-		List<ProductPriceDto> dlist = new List<ProductPriceDto>();
-
-		for(int i=0; i<list.size(); i++) {
-			dlist[i] = mapping.toProductPriceDto(list[i]);
-		}
-
-		return dlist;
+		return result;
 	}
 }
 
 @Service
 public class DisplayServiceImpl implements DisplayService {
 	
-	public DisplayInfoDto getDisplayInfo(Integer displayInfoId) {
-		DisplayInfo displayInfo = displayInfoDao.selectById(displayInfoId);
+	public Map<String, Object> getDisplayInfo(Integer displayInfoId) {
+		
+		DisplayInfoDto displayInfoDto = mapping.toDisplayInfoDto(displayInfoDao.selectById(displayInfoId));
 
-		DisplayInfoDto displayInfoDto = mapping.toDisplayInfoDto(displayInfo);
+		List<Comment> ecomments = commentDao.selectAll();
+		List<CommentDto> dcomments = new List<CommentDto>();
+		double averageScore = 0;
+		for(int i=0; i<ecomments.size(); i++) {
+			averageScore += ecomments.getScore();
+			dcomments[i] = mapping.toCommentDto(ecomments[i]);
+		}
+		averageScore /= ecomments.size();
 
-		return displayInfoDto;
-	}
+		List<DisplayInfoImage> eDisplayImages = displayInfoImage.selectAll();
+		List<ImageDto> dDisplayImages = new List<ImageDto>();
+		for(int i=0; i<eDisplayImages.size(); i++) {
+			dDisplayImages[i] = mapping.toDisplayInfoImageDto(eDisplayImages[i]);
+		}
 
-	public ImageDto getDisplayInfoImage(Integer displayInfoId) {
-		DisplayInfoImage displayInfoImage = displayInfoImageDao.selectById(displayInfoId);
+		List<ProductImage> eproductImages = productImageDao.selectAll(displayInfoDto.getProductId());
+		List<ProductImageDto> dproductImages = new List<ProductImageDto>();
+		for(int i=0; i<eproductImages.size(); i++) {
+			dproductImages[i] = mapping.toProductImageDto(eproductImages[i]);
+		}
 
-		ImageDto displayInfoImageDto = mapping.toDisplayInfoImageDto(displayInfoImage);
+		List<ProductPrice> eproductPrices = productPriceDao.selectAll();
+		List<ProductPriceDto> dprodcutPrices = new List<ProductPriceDto>();
+		for(int i=0; i<eproductPrices.size(); i++) {
+			dprodcutPrices[i] = mapping.toProductPriceDto(eproductPrices[i]);
+		}
 
-		return displayInfoImageDto;
+		Map<String, Object> result = new HashMap<>();
+		result.put("averageScore", averageScore);
+		result.put("comments", dcomments);
+		result.put("displayInfo", displayInfoDto);
+		result.put("displayInfoImage", dDisplayImages);
+		result.put("productImages", dproductImages);
+		result.put("prodcutPrices", dprodcutPrices);
+
+		return result;
 	}
 }
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
     
-	public List<ReservationInfoDto> getReservations(String reservationEmail) {
-		List<ReservationInfo> list = reservationDao.selectAll(reservationEmail);
+	public Map<String, Object> getAllReservationInfos(String reservationEmail) {
 
+		List<ReservationInfo> elist = reservationDao.selectAll(reservationEmail);
 		List<ReservationInfoDto> dlist = new List<ReservationInfoDto>();
-
-		for(int i=0; i<list.size(); i++) {
-			dlist[i] = mapping.toReservationInfoDto(list[i]);
+		for(int i=0; i<elist.size(); i++) {
+			dlist[i] = mapping.toReservationInfoDto(elist[i]);
 		}
-
-		return dlist;
+		
+		Map<String, Object> result = new HashMap<>();
+		result.put("reservations", dlist);
+		result.put("size", dlist.size());
 	}
 
-    public ReservationResponseDto addreservation(Map<String, Object> reservationParam, Integer clientIp) {
+    public void createReservation(ReservationResponseDto reservationResponseDto, String clientIp) {
 		// 받는 건 제대로 받아서 저장하고 반환하는 값은 Random으로 생성된 예약 객체이다.
 		// 이건 남의 코드 확인해서 해보자.
+		ReservationInfo reservationInfo = toReservationInfo(reservationResponseDto);
+		List<ReservationPriceDto> prices = reservationResponseDto.getReservationPrices();
+		List<ReservationInfoPrice> plist = new List<ReservationInfoPrice>();
+		for(int i=0; i<prices.size(); i++) {
+			plist[i] = toReservationInfoPrices(prices[i]);
+		}
+		
+		int p1 = ReservationDao.createReservationInfo(reservationInfo);
+		int p2 = ReservationDao.createReservationInfoPrices(plist);          
 	}
-	/*param에 들어온 값을 map으로 접근해서 하나하나 값 찾아서 reservationResponse에 담기
-	{
-		"displayInfoId": 0,
-		"prices": [
-			{
-			"count": 0,
-			"productPriceId": 0,
-			"reservationInfoId": 0,
-			"reservationInfoPriceId": 0
-			}
-		],
-		"productId": 0,
-		"reservationEmail": "string",
-		"reservationName": "string",
-		"reservationTelephone": "string",
-		"reservationYearMonthDay": "string"
+	
+	public int cancelReservation(Integer reservationInfoId) {
+		return ReservationDao.cancelReservation(reservationInfoId);
 	}
-	public class ReservationInfoDto {
-    private Integer cancelYn;
-    private LocalDateTime createDate;
-    private DisplayInfoDto displayInfo;
-    private Integer displayInfoId;
-    private LocalDateTime modifyDate;
-    private Integer productId;
-    private String reservationDate;
-    private String reservationEmail;
-    private Integer reservationInfoId;
-    private String reservationName;
-    private String reservationTelephone;
-    private Integer totalPrice;
 }
-	*/
-    ReservationResponseDto reservationResponseDto = reservationService.deleteReservation(ReservationId, reservationResponseDto, clientIp);
-	/* 위랑 마찬가지로 처리하면 됌.
-	{
-		"reservationInfoId": 0,
-		"productId": 20,
-		"displayInfoId": 18,
-		"reservationName": "Admin",
-		"reservationTelephone": "010-1111-2222",
-		"reservationEmail": "admin@admin.com",
-		"reservationDate": "2023-03-24",
-		"cancelYn": true,
-		"createDate": "2023-03-24T14:53:26.8",
-		"modifyDate": "2023-03-24T14:53:26.8",
-		"prices": [
-			{
-			"reservationInfoPriceId": 67,
-			"reservationInfoId": 0,
-			"productPriceId": 6,
-			"count": 6
-			}
-		]
-	}
-	*/
-}
+
 @Service
 public class CommentServiceImpl implements CommentService {
+    public void createComment(CommentResponseDto commentResponseDto) {
 
-	public List<CommentDto> getComments(Integer displayInfo) {
-		List<Comment> list = commentDao.selectAll(displayInfo);
+		ReservationUserComment comment = toComment(commentResponseDto);
+		ReservationUserCommentImage image = toImage(commentResponseDto.getImageDto()); // imageid, fileid만 저장
+		image.setReservationInfoId(comment.getReservationInfoId());
+		image.setCommentId(comment.getCommentId());
 
-		List<CommentDto> dlist = new List<CommentDto>();
-
-		for(int i=0; i<list.size(); i++) {
-			dlist[i] = mapping.toCommentDto(list[i]);
-		}
-
-		return dlist;
+		int p1 = CommentDao.createComment(comment);
+		int p2 = CommentDao.createCommentImage(image);            
 	}
-
-    CommentResponseDto commentResponseDto = commentService.addcomment(attachedImage, comment, productId, reservationInfoId, score, clientIp);
-	/* 얘는 받아온 거 이미지 처리만하고 그대로 담아서 반환.
-	{
-		"commentId": 39,
-		"productId": 1,
-		"reservationInfoId": 1,
-		"score": 1,
-		"comment": "1",
-		"createDate": "2023-03-24T15:05:12.607",
-		"modifyDate": "2023-03-24T15:05:12.607",
-		"commentImage": null
-	}
-	*/
 }
+
 @Service
 public class PromotionServiceImpl implements PromotionService {
 
-	public List<PromotionDto> getPromotions(){
-		List<Promotion> list = promotionDao.selectAll();
+	public List<PromotionDto> getAllPromotions(){
+		List<Promotion> elist = promotionDao.selectAll();
 
 		List<PromotionDto> dlist = new List<PromotionDto>();
 
-		for(int i=0; i< list.size(); i++) {
-			dlist[i] = mapping.toPromotionDto(list[i]);
+		for(int i=0; i< elist.size(); i++) {
+			dlist[i] = mapping.toPromotionDto(elist[i]);
 		}
 
 		return dlist;

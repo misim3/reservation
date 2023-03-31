@@ -23,135 +23,76 @@ public class ApiController {
     
     // 상품 목록 구하기
     @GetMapping("/products")
-    public Products getAllProducts(Integer categoryId, Integer start) {
-        List<Products> getAllProducts(categoryId, start);
+    public Map<String, Object> getProducts(Integer categoryId, Integer start) {
+        return ProductService.getAllProducts(categoryId, start);
     }
     
     // 상품 전시 정보 구하기
     @GetMapping("/products/{displayInfoId}")
-    public DisplayInfo getDisplayInfo(Integer displayInfoId) {
-        DisplayDto getDisplayDtoById(displayInfoId);
+    public Map<String, Object> getDisplay(Integer displayInfoId) {
+        return DisplayInfoService.getDisplayInfo(displayInfoId);
     }
     
     // 예약 정보 조회
     @GetMapping("/reservations")
-    public ReservationInfos getReservationInfos(String reservationEmail) {
-        List<ReservationInfos> getAllReservationInfos(reservationEmail);
+    public Map<String, Object> getReservations(String reservationEmail) {
+        return ReservationService.getAllReservationInfos(reservationEmail);
     }
 
     // 예약하기
     @PostMapping("/reservations")
-    public ReservationInfo createReservation(reservationParam?) {
-        // 컨트롤러
-        (@RequestBody ReservationResponseDto reservationResponseDto) // 이런 방식으로 만들어도 될 것 같다.
-        ReservationService.createReservation(reservationResponseDto);
+    public ReservationResponseDto createReservation(@RequestBody ReservationResponseDto reservationResponseDto) {
+        
+        String clientIp = request.getRemoteAddr();
 
-        // 유효성 검사
+        ReservationService.createReservation(reservationResponseDto, clientIp);
 
+        // 유효성 검사 - ?
+        
         // 랜덤 생성 예약 객체 반환
-        return random();
-        // 서비스
-        public Long createReservation(ReservationResponseDto reservationResponseDto) {
-
-            ReservationInfo reservationInfo = toReservationInfo(ReservationResponseDto reservationResponseDto);
-            // reservationResponseDto.getReservationPrices();
-            List<ReservationInfoPrice> list = toReservationInfoPrices(List<ReservationPriceDto> prices);
-
-            int p1 = ReservationDao.createReservationInfo(reservationInfo);
-            int p2 = ReservationDao.createReservationInfoPrices(list);            
-            
-            if (p1 == 1 && p2 == 1) {
-                // 유효성 검사
-                return 1;
-            }
-            return 0;
-        }
-        // 레포지토리
-        public Long createReservationInfo(ReservationInfo reservationInfo) {
-			SqlParameterSource params = new BeanPropertySqlParameterSource(reservationInfo);
-			return insertAction.executeAndReturnKey(params).longValue();
-        }
-        public Long createReservationInfoPrices(List<ReservationInfoPrice> list) {
-			SqlParameterSource params = new BeanPropertySqlParameterSource(list);
-			return insertAction.executeAndReturnKey(params).longValue();
-        }
+        ReservationResponseDto randomDto = new ReservationResponseDto();
+        return randomDto;
     }
+        
     
     // 예약 취소하기
     @PutMapping("/reservations/{reservationInfoId}")
-    public void cancelReservation(Integer reservationInfoId) {
-        // 컨트롤러
+    public ReservationResponseDto cancelReservation(Integer reservationInfoId) {
+
+        String clientIp = request.getRemoteAddr();
+
         ReservationService.cancelReservation(reservationInfoId);
 
         // 유효성 검사
 
         // 랜덤 생성 예약 객체 반환
-        return random();
-
-        // 서비스
-        public int cancelReservation(Integer reservationInfoId) {
-            ReservationDao.cancelReservation(reservationInfoId);
-
-            // 유효성 검사
-        }
-
-        // 레포지토리
-        public Long cancelReservation(Integer reservationInfoId) {
-            Map<String, Integer> param = Collections.singletonMap("reservationInfoId", reservationInfoId);
-            return jdbc.update(UPDATE_BY_ID, param);
-        }
+        ReservationResponseDto randomDto = new ReservationResponseDto();
+        return randomDto;
     }
+        
     
     // 한줄평 등록
     @PostMapping("/reservations/{reservationInfoId}/comments")
-    public ? createComment(file?, String comment, Integer productId, Integer reservationInfoId, Integer score) {
-        // 컨트롤러
-        (@RequestBody CommentResponseDto commentResponseDto) // 이런 방식으로 만들어도 될 것 같다.
+    public CommentResponseDto createComment(@RequestBody CommentResponseDto commentResponseDto) {
+
         CommentService.createComment(commentResponseDto);
 
         // 유효성 검사
 
         // 랜덤 생성 예약 객체 반환
-        return random();
-        // 서비스
-        public Long createComment(CommentResponseDto commentResponseDto) {
-
-            ReservationUserComment comment = toComment(CommentResponseDto commentResponseDto);
-            // commentResponseDto.getImage();
-            ReservationUserCommentImage image = toImage(ImageDto image);
-
-            int p1 = CommentDao.createComment(comment);
-            int p2 = CommentDao.createCommentImage(image);            
-            
-            if (p1 == 1 && p2 == 1) {
-                // 유효성 검사
-                return 1;
-            }
-            return 0;
-        }
-        // 레포지토리
-        public Long createComment(ReservationUserComment comment) {
-			SqlParameterSource params = new BeanPropertySqlParameterSource(comment);
-			return insertAction.executeAndReturnKey(params).longValue();
-        }
-        public Long createCommentImage(ReservationUserCommentImage image) {
-			SqlParameterSource params = new BeanPropertySqlParameterSource(image);
-			return insertAction.executeAndReturnKey(params).longValue();
-        }
+        CommentResponseDto randomDto = new CommentResponseDto();
+        return randomDto;
     }
-
+    
     // 카테고리 목록 구하기
     @GetMapping("/categories")
-    public categories? getAllCategories() {
-        List<CategoryDto> getAllCategories();
+    public List<categorieDto> getCategories() {
+        return CategoryService.getAllCategories();
     }
 
     // 프로모션 목록 구하기
     @GetMapping("/promotions")
-    public promotions? getAllPromotions() {
-        list getpromotion
-        id
-        productId
-        productimageurl
+    public List<promotionDto> getPromotions() {
+        return PromotionService.getAllPromotions();
     }
 }

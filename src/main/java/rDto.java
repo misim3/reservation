@@ -1,3 +1,5 @@
+// createdate, modifydate는 일단 기본생성자로 생성되면 바로 현재 시간 할당
+
 public class ProductDto {
     private Integer displayInfoId;
     private String placeName;
@@ -95,7 +97,7 @@ public class ReservationResponseDto {
     private LocalDateTime createDate;
     private Integer displayInfoId;
     private LocalDateTime modifyDate;
-    private List<ReservationPriceDto> prices;
+    private List<ReservationPriceDto> prices; //
     private Integer productId;
     private String reservationDate;
     private String reservationEmail;

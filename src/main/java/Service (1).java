@@ -7,31 +7,28 @@
 // 아래는 api에서 요구한 메소드
 
 public interface CategoryService {
-    List<CategoryDto> getAllCategories();
+    List<CategoryDto> getAllCategories();//
 }
 
 
 public interface PromotionService {
-    List<Promotion> getAllPromotions();
+    List<PromotionDto> getAllPromotions();//
 }
 
 public interface ProductService {
-    List<Products> getAllProducts(Integer categoryId, Integer start);
-    Product getProductById(Integer productId);
-    List<ProductImage> getProductImages(Integer productId);
-    List<ProductPrice> getProductPrices(Integer productId);
-    List<DisplayInfo> getDisplayInfos(Integer productId);
+    Map<String, Object> getAllProducts(Integer categoryId, Integer start);//
 }
 
 public interface DisplayInfoService {
-    Display getDisplayDtoById(Integer displayInfoId);
-    List<DisplayInfoImage> getDisplayInfoImages(Integer displayInfoId);
+    Map<String, Object> getDisplayDto(Integer displayInfoId);//
 }
 
 public interface ReservationService {
-    List<ReservationInfos> getAllReservationInfos(String reservationEmail);
-    ReservationInfo getReservationInfoById(Integer reservationInfoId);
-    List<ReservationInfoPrice> getReservationInfoPrices(Integer reservationInfoId);
-    ReservationUserComment getReservationUserComment(Integer reservationInfoId);
-    List<ReservationUserCommentImage> getReservationUserCommentImages(Integer reservationUserCommentId);
+    Map<String, Object> getAllReservationInfos(String reservationEmail);//
+    void createReservation(ReservationResponseDto reservationResponseDto, String clientIp);//
+    void cancelReservation(Integer reservationInfoId);//
+ }
+
+public interface CommentService {
+    CommentResponseDto createComment(CommentResponseDto commentResponseDto);//
 }
