@@ -17,8 +17,11 @@
           ├── controller
           ├── dao
           ├── dto
-          ├── entity
-          └── service
+          ├── exception
+          ├── service
+          ├── type
+          └── util
+    ├── resources
     └── webapp
           └── img
           
