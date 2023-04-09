@@ -20,12 +20,7 @@
           ├── entity
           └── service
     └── webapp
-          ├── web-inf
-                 ├── views
-          ├── css
-          ├── font
-          ├── img
-          └── js
+          └── img
           
 
 ## 3. 데이터베이스 ERD
