@@ -1,4 +1,4 @@
-# reservation
+# reservation - 네이버 예약관리 시스템 클론 코딩
 
 ![main](https://user-images.githubusercontent.com/59640360/230757019-7cd0bef8-aa15-4722-87a9-620eb11053b5.jpg)
 
