@@ -29,3 +29,8 @@
 ## 3. 데이터베이스 ERD
 
 [데이터베이스 ERD](https://github.com/misim3/reservation/wiki/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4-ERD)
+
+
+## 4. API 명세서(강의에서 제공된 API)
+
+[API 명세서](http://49.236.147.192:9090/swagger-ui.html)
