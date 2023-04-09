@@ -22,4 +22,6 @@
           └── jsp - 화면 출력
           
 
-## [데이터베이스 ERD](https://github.com/misim3/reservation/wiki/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4-ERD)
+## 3. 데이터베이스 ERD
+
+[데이터베이스 ERD](https://github.com/misim3/reservation/wiki/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4-ERD)
